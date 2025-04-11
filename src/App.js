@@ -78,10 +78,12 @@ const {userAuth}=require("./middlewares/auth");
 const authRouter=require("./Router/authRouter");
 const profileRouter=require("./Router/profile");
 const connectionRouter=require("./Router/connectionRouter");
+const userRouter=require("./Router/UserRequest");
 
 app.use("/",authRouter);
 app.use("/",profileRouter);
 app.use("/",connectionRouter);
+app.use("/",userRouter);
  
 
 const connectDB=require("./config/database");

@@ -5,10 +5,12 @@ const connectionSchema=new mongoose.Schema({
     fromUserId:{
         type:mongoose.Schema.Types.ObjectId,// type of id
         required:true,
+        ref:"user", //reference to the user model
     },
     toUserId:{
         type:mongoose.Schema.Types.ObjectId,
         required:true,
+        ref:"user",
     },
     status:{
         type:String,
@@ -23,6 +25,7 @@ const connectionSchema=new mongoose.Schema({
 },
 {
     timestamps:true,
+    
 }
 )
 
