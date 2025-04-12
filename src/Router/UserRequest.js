@@ -10,7 +10,8 @@ userRouter.get("/user/request/received",userAuth,async(req,res)=>{
 
         const receivedId=req.User._id;
 
-        const connectionRequest=await connectionRequestSchema.find({toUserId:receivedId,status:"interested"}).populate("fromUserId","firstName lastName");
+        const connectionRequest=await connectionRequestSchema.find({toUserId:receivedId,status:"interested"})
+        .populate("fromUserId","firstName lastName");
         
         if(!connectionRequest)
         {
@@ -27,7 +28,7 @@ userRouter.get("/user/request/received",userAuth,async(req,res)=>{
 
 
 
-userRouter.get("/user/request/sent",userAuth,async(req,res)=>{
+userRouter.get("/user/request/connection",userAuth,async(req,res)=>{
     try{
         const loginUserid=req.User._id;
 
@@ -61,5 +62,52 @@ userRouter.get("/user/request/sent",userAuth,async(req,res)=>{
         res.status(401).send("error in connection request " + err.message);
     }
 })
+
+
+userRouter.get("/user/request/feed",userAuth,async(req,res)=>{
+    try{
+
+         const senderId=req.User._id;
+         const loginUserId=req.User._id;
+         const receivedId=req.User._id;
+         const userData=await User.find({});
+
+         const page=parseInt(req.query.page) ||1;
+         let limit=parseInt(req.query.limit)||10;
+
+         limit=limit>=50?50:limit; // if user put to more limit so, sanetize it
+
+         const skip=(page-1)*limit;
+
+
+        const loginUser=req.User._id;
+
+        const connectionIds=await connectionRequestSchema.find(
+            {$or:[{fromUserId:loginUser._id},{toUserId:loginUser._id}]}
+        ).select("fromUserId toUserId");
+
+        const hiddenData=new Set();
+
+        connectionIds.forEach((data)=>{
+            hiddenData.add(data.fromUserId.toString());
+            hiddenData.add(data.toUserId.toString());
+        });
+
+        const feedData=await User.find({
+            $and:[{_id:{$nin:Array.from(hiddenData)}},{_id:{
+                $ne:loginUser._id
+            }}]
+        }).select("firstName lastName age skills")
+        .skip(skip)
+        .limit(limit);
+
+        res.json({data:feedData});
+ 
+    }
+    catch(err)
+    {
+        res.status(401).send("error in connection request " + err.message);
+    }
+});
 
 module.exports=userRouter;

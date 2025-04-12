@@ -108,8 +108,16 @@ const {validateData}=require("../util/validator");
     //     }
 
     // this solutin it given by sir
-
-    req.cookie("token",null,{ expires:new Date(Date.now()),});
+  try{
+    res.cookie("token", null, {
+      expires: new Date(Date.now()),
+    });
+    res.send("Logout Successful!!");
+  }
+  catch(err)
+  {
+    res.status(401).send("error in logout " + err.message);
+  }
     });
 
 
